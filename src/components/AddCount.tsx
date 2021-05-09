@@ -1,10 +1,24 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import React, { FC } from 'react';
+import { connect, ConnectedProps } from 'react-redux';
 
-import { addCount } from '~/store/actions/count-action';
+import { addCount } from '~/store/actions/counter-action';
+import { RootState } from '~/store/reducers';
 
-const AddCount = ({ count, addCount }) => {
+const mapStateToProps = (state: RootState) => ({
+  count: state.counter.count,
+});
+
+const mapDispatchToProps = {
+  addCount: addCount,
+};
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+type Props = PropsFromRedux;
+
+const AddCount: FC<Props> = ({ count, addCount }) => {
   return (
     <div>
       <style jsx>{`
@@ -15,19 +29,9 @@ const AddCount = ({ count, addCount }) => {
       <h1>
         AddCount: <span>{count}</span>
       </h1>
-      <button onClick={addCount}>Add To Count</button>
+      <button onClick={() => addCount(2)}>Add To Count</button>
     </div>
   );
 };
 
-const mapStateToProps = (state) => ({
-  count: state.count.count,
-});
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    addCount: bindActionCreators(addCount, dispatch),
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(AddCount);
+export default connector(AddCount);

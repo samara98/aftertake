@@ -1,20 +1,22 @@
-import { TICK_TICK } from '../types/tick-type';
+import { Dispatch } from 'react';
 
-export const serverRenderClock = (isServer) => (dispatch) => {
-  return dispatch({
-    type: TICK_TICK,
+import { TickAction, TickType } from '../types';
+
+export const serverRenderClock = (isServer: boolean) => {
+  return {
+    type: TickType.TICK_TICK,
     payload: {
       light: !isServer,
       ts: Date.now(),
     },
-  });
+  };
 };
 
-export const startClock = () => (dispatch) => {
+export const startClock = () => (dispatch: Dispatch<TickAction>) => {
   return setInterval(
     () =>
       dispatch({
-        type: TICK_TICK,
+        type: TickType.TICK_TICK,
         payload: { light: true, ts: Date.now() },
       }),
     1000,

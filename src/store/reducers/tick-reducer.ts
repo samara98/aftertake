@@ -1,13 +1,13 @@
-import { TICK_TICK } from '../types/tick-type';
+import { TickAction, TickType } from '../types';
 
-const tickInitialState = {
+const initialState = {
   lastUpdate: 0,
   light: false,
 };
 
-export default function tickReducer(state = tickInitialState, action) {
+export default function tickReducer(state = initialState, action: TickAction) {
   switch (action.type) {
-    case TICK_TICK:
+    case TickType.TICK_TICK:
       return { ...state, lastUpdate: action.payload.ts, light: !!action.payload.light };
     default:
       return state;

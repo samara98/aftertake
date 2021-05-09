@@ -1,34 +1,37 @@
-import { useEffect } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import { FC, useEffect } from 'react';
+import { connect, ConnectedProps } from 'react-redux';
 
 import Page from '~/components/Page';
-import { addCount } from '~/store/actions/count-action';
-import { serverRenderClock, startClock } from '~/store/actions/tick-action';
+import { countAction, tickAction } from '~/store/actions';
 import { wrapper } from '~/store/store';
 
-const Other = (props) => {
+const mapDispatchToProps = {
+  addCount: countAction.addCount,
+  startClock: tickAction.startClock,
+  serverRenderClock: tickAction.serverRenderClock,
+};
+
+const connector = connect(null, mapDispatchToProps);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+type Props = PropsFromRedux & {};
+
+export const getServerSideProps = wrapper.getServerSideProps(async ({ store }) => {
+  store.dispatch(tickAction.serverRenderClock(true));
+  store.dispatch(countAction.addCount());
+});
+
+const Other: FC<Props> = ({ startClock }) => {
   useEffect(() => {
-    const timer = props.startClock();
+    const timer = startClock();
 
     return () => {
       clearInterval(timer);
     };
-  }, [props]);
+  }, []);
 
-  return <Page title="Other Page" linkTo="/" />;
+  return <Page title="Other Page" linkTo="/counter" />;
 };
 
-export const getServerSideProps = wrapper.getServerSideProps(async ({ store }) => {
-  store.dispatch(serverRenderClock(true));
-  store.dispatch(addCount());
-});
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    addCount: bindActionCreators(addCount, dispatch),
-    startClock: bindActionCreators(startClock, dispatch),
-  };
-};
-
-export default connect(null, mapDispatchToProps)(Other);
+export default connector(Other);
